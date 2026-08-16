@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Калькулятор потерь на поиске информации</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=PT+Serif:wght@400;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#EAEBDF; --paper2:#E2E4D4; --ink:#1E2A22; --rule:#B9C2AC;
+  --stamp:#A6321F; --tape:#F8F6EE; --gold:#8A6D3B; --shadow:rgba(30,42,34,.18);
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--paper);
+  background-image:repeating-linear-gradient(var(--paper) 0 27px, var(--rule) 27px 28px);
+  color:var(--ink); font-family:'PT Serif',serif;
+  min-height:100vh; padding:40px 16px;
+}
+.wrap{max-width:920px;margin:0 auto}
+h1{
+  font-family:'Special Elite',monospace; font-size:clamp(22px,4vw,32px);
+  letter-spacing:.5px; margin:0 0 6px; line-height:1.3;
+}
+.sub{color:#4b5a4f;margin:0 0 32px;max-width:640px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+@media (max-width:760px){.grid{grid-template-columns:1fr}}
+.card{
+  background:var(--paper2); border:1px solid var(--rule); border-radius:2px;
+  padding:24px; box-shadow:0 1px 0 var(--rule) inset;
+}
+.card h2{
+  font-family:'Special Elite',monospace; font-size:15px; margin:0 0 18px;
+  text-transform:uppercase; letter-spacing:1px; color:#3a453d;
+}
+label{display:block;font-size:13px;color:#4b5a4f;margin-bottom:4px}
+.field{margin-bottom:18px}
+.field input{
+  width:100%; font-family:'IBM Plex Mono',monospace; font-size:18px;
+  background:transparent; border:none; border-bottom:1px dashed var(--rule);
+  padding:6px 2px; color:var(--ink); outline:none;
+}
+.field input:focus{border-bottom-color:var(--stamp)}
+.hint{font-size:12px;color:#7a8579;margin-top:3px}
+/* receipt tape */
+.tape-holder{display:flex;justify-content:center}
+.tape{
+  background:var(--tape); width:100%; max-width:340px;
+  padding:22px 20px 30px; font-family:'IBM Plex Mono',monospace; font-size:13px;
+  box-shadow:0 10px 24px var(--shadow);
+  clip-path:polygon(0 0,100% 0,100% 96%,95% 100%,90% 96%,85% 100%,80% 96%,75% 100%,70% 96%,65% 100%,60% 96%,55% 100%,50% 96%,45% 100%,40% 96%,35% 100%,30% 96%,25% 100%,20% 96%,15% 100%,10% 96%,5% 100%,0 96%);
+  position:relative;
+}
+.tape .line{display:flex;justify-content:space-between;gap:10px;padding:3px 0;color:#33402f}
+.tape .line.dim{color:#8a9184}
+.tape hr{border:none;border-top:1px dashed #b7bfa9;margin:10px 0}
+.tape .total-label{font-family:'Special Elite',monospace;font-size:12px;letter-spacing:1px;margin-top:14px}
+.stamp{
+  font-family:'Special Elite',monospace; color:var(--stamp);
+  border:3px solid var(--stamp); border-radius:6px; display:inline-block;
+  padding:10px 14px; transform:rotate(-4deg); margin-top:8px;
+  font-size:clamp(20px,5vw,26px); line-height:1.15; opacity:.92;
+}
+.stamp small{display:block;font-size:11px;letter-spacing:1px;opacity:.85}
+footer{margin-top:34px;font-size:13px;color:#5b665c}
+footer a{color:var(--gold)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Сколько ваша компания теряет на поиске информации</h1>
+  <p class="sub">Простой расчёт: сколько времени и денег уходит впустую, когда сотрудники не могут быстро найти нужный документ или ответ.</p>
+
+  <div class="grid">
+    <div class="card">
+      <h2>Ваши данные</h2>
+      <div class="field">
+        <label for="minutes">Минут в день на поиск информации (на 1 сотрудника)</label>
+        <input id="minutes" type="number" min="0" value="10">
+      </div>
+      <div class="field">
+        <label for="people">Сотрудников за компьютером</label>
+        <input id="people" type="number" min="0" value="100">
+      </div>
+      <div class="field">
+        <label for="days">Рабочих дней в месяце</label>
+        <input id="days" type="number" min="1" value="22">
+        <div class="hint">по умолчанию — среднее по РФ</div>
+      </div>
+      <div class="field">
+        <label for="salary">Средняя зарплата сотрудника, ₽/мес</label>
+        <input id="salary" type="number" min="0" value="60000">
+      </div>
+      <div class="field">
+        <label for="hours">Рабочих часов в дне</label>
+        <input id="hours" type="number" min="1" value="8">
+      </div>
+    </div>
+
+    <div class="tape-holder">
+      <div class="tape">
+        <div class="line"><span>минут / день / чел</span><span id="o-minutes">10</span></div>
+        <div class="line"><span>× сотрудников</span><span id="o-people">100</span></div>
+        <div class="line"><span>× рабочих дней</span><span id="o-days">22</span></div>
+        <div class="line dim"><span>= минут в месяц</span><span id="o-min-total">22 000</span></div>
+        <hr>
+        <div class="line"><span>= часов в месяц</span><span id="o-hours-total">366</span></div>
+        <div class="line"><span>стоимость часа</span><span id="o-hour-cost">340 ₽</span></div>
+        <hr>
+        <div class="total-label">ИТОГО В МЕСЯЦ</div>
+        <div class="line"><span>потери компании</span><span id="o-month">125 000 ₽</span></div>
+        <div class="stamp">≈ <span id="o-year">1 500 000 ₽</span><small>потерь в год</small></div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    Считаю только время на поиск — без учёта ошибок из-за устаревшей информации и повторной работы.
+    Строю RAG-систему для базы знаний компании — подробнее в
+    <a href="https://t.me/" target="_blank" rel="noopener">телеграм-канале</a>.
+  </footer>
+</div>
+
+<script>
+const els = ['minutes','people','days','salary','hours'].reduce((a,id)=>(a[id]=document.getElementById(id),a),{});
+const fmt = n => Math.round(n).toLocaleString('ru-RU');
+function calc(){
+  const minutes = +els.minutes.value || 0;
+  const people = +els.people.value || 0;
+  const days = +els.days.value || 0;
+  const salary = +els.salary.value || 0;
+  const hours = +els.hours.value || 1;
+
+  const minTotal = minutes * people * days;
+  const hoursTotal = minTotal / 60;
+  const hourCost = salary / days / hours;
+  const monthLoss = hoursTotal * hourCost;
+  const yearLoss = monthLoss * 12;
+
+  document.getElementById('o-minutes').textContent = fmt(minutes);
+  document.getElementById('o-people').textContent = fmt(people);
+  document.getElementById('o-days').textContent = fmt(days);
+  document.getElementById('o-min-total').textContent = fmt(minTotal);
+  document.getElementById('o-hours-total').textContent = fmt(hoursTotal);
+  document.getElementById('o-hour-cost').textContent = fmt(hourCost) + ' ₽';
+  document.getElementById('o-month').textContent = fmt(monthLoss) + ' ₽';
+  document.getElementById('o-year').textContent = fmt(yearLoss) + ' ₽';
+}
+Object.values(els).forEach(el => el.addEventListener('input', calc));
+calc();
+</script>
+</body>
+</html>
