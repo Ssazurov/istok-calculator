@@ -48,6 +48,11 @@ label{display:block;font-size:13px;color:#4b5a4f;margin-bottom:4px}
 }
 .field input:focus{border-bottom-color:var(--stamp)}
 .hint{font-size:12px;color:#7a8579;margin-top:3px}
+.toggle{display:flex;border:1px solid var(--rule);border-radius:3px;overflow:hidden;margin-top:4px}
+.toggle-btn{flex:1;padding:8px;background:var(--paper2);border:none;border-right:1px solid var(--rule);
+  font-family:'IBM Plex Mono',monospace;font-size:12px;color:#4b5a4f;cursor:pointer}
+.toggle-btn:last-child{border-right:none}
+.toggle-btn.active{background:var(--gold);color:#fff}
 /* receipt tape */
 .tape-holder{display:flex;justify-content:center}
 .tape{
@@ -64,10 +69,21 @@ label{display:block;font-size:13px;color:#4b5a4f;margin-bottom:4px}
 .stamp{
   font-family:'Special Elite',monospace; color:var(--stamp);
   border:3px solid var(--stamp); border-radius:6px; display:inline-block;
-  padding:10px 14px; transform:rotate(-4deg); margin-top:8px;
+  padding:10px 14px; transform:rotate(-4deg); margin-top:8px; margin-left:50px;
+  font-size:clamp(20px,5vw,26px); line-height:1.15; opacity:.92;
+}
+.stamp2{
+  font-family:'Special Elite',monospace; color:var(--stamp);
+  border:3px solid var(--stamp); border-radius:6px; display:inline-block;
+  padding:10px 14px; transform:rotate(-4deg); margin-top:8px; margin-left:300px;
   font-size:clamp(20px,5vw,26px); line-height:1.15; opacity:.92;
 }
 .stamp small{display:block;font-size:11px;letter-spacing:1px;opacity:.85}
+.stamp2 small{display:block;font-size:11px;letter-spacing:1px;opacity:.85}
+.rag-card{margin-top:28px}
+.rag-card .line{display:flex;justify-content:space-between;padding:4px 0;
+  font-family:'IBM Plex Mono',monospace;font-size:14px;color:#33402f}
+.rag-card input[type=range]{width:100%;accent-color:var(--gold);margin-top:6px}
 footer{margin-top:34px;font-size:13px;color:#5b665c}
 footer a{color:var(--gold)}
 </style>
@@ -77,7 +93,7 @@ footer a{color:var(--gold)}
   <div class="brand"><img src="istok_logo.png" alt="ИСТОК"><span>ИСТОК</span></div>
   <h1>Сколько ваша компания теряет на поиске информации</h1>
   <p class="sub">Простой расчёт: сколько времени и денег уходит впустую, когда сотрудники не могут быстро найти нужный документ или ответ.</p>
-  <p class="privacy">✅ Данные считаются в браузере, никуда не отправляются и не сохраняются — можно вводить реальные цифры.</p>
+  <p class="privacy">✅ Данные никуда не отправляются и не сохраняются.</p>
 
   <div class="grid">
     <div class="card">
@@ -96,30 +112,57 @@ footer a{color:var(--gold)}
         <div class="hint">по умолчанию — среднее по РФ</div>
       </div>
       <div class="field">
-        <label for="salary">Средняя зарплата сотрудника, ₽/мес</label>
-        <input id="salary" type="number" min="0" value="60000">
+        <label>Как считать стоимость часа</label>
+        <div class="toggle">
+          <button type="button" id="mode-salary" class="toggle-btn active">от зарплаты</button>
+          <button type="button" id="mode-rate" class="toggle-btn">ставка вручную</button>
+        </div>
       </div>
-      <div class="field">
-        <label for="hours">Рабочих часов в дне</label>
-        <input id="hours" type="number" min="1" value="8">
+      <div id="salary-fields">
+        <div class="field">
+          <label for="salary">Средняя зарплата сотрудника, ₽/мес</label>
+          <input id="salary" type="number" min="0" value="60000">
+        </div>
+        <div class="field">
+          <label for="hours">Рабочих часов в дне</label>
+          <input id="hours" type="number" min="1" value="8">
+        </div>
+      </div>
+      <div class="field" id="rate-field" style="display:none">
+        <label for="rate">Ставка часа, ₽</label>
+        <input id="rate" type="number" min="0" value="500">
       </div>
     </div>
 
     <div class="tape-holder">
       <div class="tape">
-        <div class="line"><span>минут / день / чел</span><span id="o-minutes">10</span></div>
+        <div class="line"><span>минут в день, 1 чел</span><span id="o-minutes">10</span></div>
         <div class="line"><span>× сотрудников</span><span id="o-people">100</span></div>
         <div class="line"><span>× рабочих дней</span><span id="o-days">22</span></div>
         <div class="line dim"><span>= минут в месяц</span><span id="o-min-total">22 000</span></div>
         <hr>
         <div class="line"><span>= часов в месяц</span><span id="o-hours-total">366</span></div>
-        <div class="line"><span>стоимость часа</span><span id="o-hour-cost">340 ₽</span></div>
+        <div class="line"><span>x стоимость часа</span><span id="o-hour-cost">340 ₽</span></div>
         <hr>
         <div class="total-label">ИТОГО В МЕСЯЦ</div>
         <div class="line"><span>потери компании</span><span id="o-month">125 000 ₽</span></div>
+        <br>
+        <br>
         <div class="stamp">≈ <span id="o-year">1 500 000 ₽</span><small>потерь в год</small></div>
       </div>
     </div>
+  </div>
+
+  <div class="card rag-card">
+    <h2>С RAG-системой ИСТОК</h2>
+    <div class="field">
+      <label for="reduction">Насколько сократится время поиска, %</label>
+      <input id="reduction" type="range" min="0" max="90" value="70">
+      <div class="hint"><span id="o-reduction">70</span>% сокращения</div>
+    </div>
+    <div class="line"><span>потери сейчас, ₽/мес</span><span id="o-before">125 000 ₽</span></div>
+    <div class="line"><span>потери с RAG, ₽/мес</span><span id="o-after">37 500 ₽</span></div>
+    <div class="stamp2">экономия <span id="o-savings">87 500 ₽</span><small>в месяц</small></div>
   </div>
 
   <footer>
@@ -130,20 +173,40 @@ footer a{color:var(--gold)}
 </div>
 
 <script>
-const els = ['minutes','people','days','salary','hours'].reduce((a,id)=>(a[id]=document.getElementById(id),a),{});
+const els = ['minutes','people','days','salary','hours','rate','reduction'].reduce((a,id)=>(a[id]=document.getElementById(id),a),{});
 const fmt = n => Math.round(n).toLocaleString('ru-RU');
+let mode = 'salary';
+const btnSalary = document.getElementById('mode-salary');
+const btnRate = document.getElementById('mode-rate');
+const salaryFields = document.getElementById('salary-fields');
+const rateField = document.getElementById('rate-field');
+function setMode(m){
+  mode = m;
+  btnSalary.classList.toggle('active', m==='salary');
+  btnRate.classList.toggle('active', m==='rate');
+  salaryFields.style.display = m==='salary' ? '' : 'none';
+  rateField.style.display = m==='rate' ? '' : 'none';
+  calc();
+}
+btnSalary.addEventListener('click', () => setMode('salary'));
+btnRate.addEventListener('click', () => setMode('rate'));
+
 function calc(){
   const minutes = +els.minutes.value || 0;
   const people = +els.people.value || 0;
   const days = +els.days.value || 0;
   const salary = +els.salary.value || 0;
   const hours = +els.hours.value || 1;
+  const rate = +els.rate.value || 0;
+  const reduction = +els.reduction.value || 0;
 
   const minTotal = minutes * people * days;
   const hoursTotal = minTotal / 60;
-  const hourCost = salary / days / hours;
+  const hourCost = mode==='salary' ? (salary / days / hours) : rate;
   const monthLoss = hoursTotal * hourCost;
   const yearLoss = monthLoss * 12;
+  const afterLoss = monthLoss * (1 - reduction/100);
+  const savings = monthLoss - afterLoss;
 
   document.getElementById('o-minutes').textContent = fmt(minutes);
   document.getElementById('o-people').textContent = fmt(people);
@@ -153,8 +216,12 @@ function calc(){
   document.getElementById('o-hour-cost').textContent = fmt(hourCost) + ' ₽';
   document.getElementById('o-month').textContent = fmt(monthLoss) + ' ₽';
   document.getElementById('o-year').textContent = fmt(yearLoss) + ' ₽';
+  document.getElementById('o-reduction').textContent = reduction;
+  document.getElementById('o-before').textContent = fmt(monthLoss) + ' ₽';
+  document.getElementById('o-after').textContent = fmt(afterLoss) + ' ₽';
+  document.getElementById('o-savings').textContent = fmt(savings) + ' ₽';
 }
-Object.values(els).forEach(el => el.addEventListener('input', calc));
+Object.values(els).forEach(el => el && el.addEventListener('input', calc));
 calc();
 </script>
 </body>
