@@ -83,7 +83,19 @@ label{display:block;font-size:13px;color:#4b5a4f;margin-bottom:4px}
 .rag-card{margin-top:28px}
 .rag-card .line{display:flex;justify-content:space-between;padding:4px 0;
   font-family:'IBM Plex Mono',monospace;font-size:14px;color:#33402f}
-.rag-card input[type=range]{width:100%;accent-color:var(--gold);margin-top:6px}
+.rag-card input[type=range]{
+  width:100%;margin-top:6px;-webkit-appearance:none;appearance:none;
+  height:6px;border-radius:3px;outline:none;
+}
+.rag-card input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;appearance:none;width:16px;height:16px;border-radius:50%;
+  background:var(--paper);border:2px solid var(--ink);cursor:pointer;margin-top:-0px;
+}
+.rag-card input[type=range]::-moz-range-thumb{
+  width:16px;height:16px;border-radius:50%;background:var(--paper);
+  border:2px solid var(--ink);cursor:pointer;
+}
+.rag-card input[type=range]::-moz-range-track{height:6px;border-radius:3px;background:transparent}
 footer{margin-top:34px;font-size:13px;color:#5b665c}
 footer a{color:var(--gold)}
 </style>
@@ -148,7 +160,7 @@ footer a{color:var(--gold)}
         <div class="line"><span>потери компании</span><span id="o-month">125 000 ₽</span></div>
         <br>
         <br>
-        <div class="stamp">≈ <span id="o-year">1 500 000 ₽</span><small>потерь в год</small></div>
+        <div class="stamp">≈ <span id="o-month-stamp">125 000 ₽</span><small>потерь в месяц</small></div>
       </div>
     </div>
   </div>
@@ -162,7 +174,8 @@ footer a{color:var(--gold)}
     </div>
     <div class="line"><span>потери сейчас, ₽/мес</span><span id="o-before">125 000 ₽</span></div>
     <div class="line"><span>потери с RAG, ₽/мес</span><span id="o-after">37 500 ₽</span></div>
-    <div class="stamp2">экономия <span id="o-savings">87 500 ₽</span><small>в месяц</small></div>
+    <div class="line"><span>экономия в месяц</span><span id="o-savings-month">87 500 ₽</span></div>
+    <div class="stamp2">экономия <span id="o-savings-year">1 050 000 ₽</span><small>в год</small></div>
   </div>
 
   <footer>
@@ -215,11 +228,15 @@ function calc(){
   document.getElementById('o-hours-total').textContent = fmt(hoursTotal);
   document.getElementById('o-hour-cost').textContent = fmt(hourCost) + ' ₽';
   document.getElementById('o-month').textContent = fmt(monthLoss) + ' ₽';
-  document.getElementById('o-year').textContent = fmt(yearLoss) + ' ₽';
+  document.getElementById('o-month-stamp').textContent = fmt(monthLoss) + ' ₽';
   document.getElementById('o-reduction').textContent = reduction;
   document.getElementById('o-before').textContent = fmt(monthLoss) + ' ₽';
   document.getElementById('o-after').textContent = fmt(afterLoss) + ' ₽';
-  document.getElementById('o-savings').textContent = fmt(savings) + ' ₽';
+  document.getElementById('o-savings-month').textContent = fmt(savings) + ' ₽';
+  document.getElementById('o-savings-year').textContent = fmt(savings * 12) + ' ₽';
+
+  const pct = (reduction - els.reduction.min) / (els.reduction.max - els.reduction.min) * 100 - 1;
+  els.reduction.style.background = `linear-gradient(90deg,var(--stamp) 0%,var(--gold) ${pct}%,var(--rule) ${pct}%,var(--rule) 100%)`;
 }
 Object.values(els).forEach(el => el && el.addEventListener('input', calc));
 calc();
