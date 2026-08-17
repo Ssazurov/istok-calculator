@@ -88,12 +88,14 @@ label{display:block;font-size:13px;color:#4b5a4f;margin-bottom:4px}
   height:6px;border-radius:3px;outline:none;
 }
 .rag-card input[type=range]::-webkit-slider-thumb{
-  -webkit-appearance:none;appearance:none;width:16px;height:16px;border-radius:50%;
-  background:var(--paper);border:2px solid var(--ink);cursor:pointer;margin-top:-0px;
+  -webkit-appearance:none;appearance:none;width:26px;height:26px;border-radius:50%;
+  background:var(--paper) url('istok_logo.png') center/75% no-repeat;
+  border:1px solid var(--gold);cursor:pointer;margin-top:-1px;
 }
 .rag-card input[type=range]::-moz-range-thumb{
-  width:16px;height:16px;border-radius:50%;background:var(--paper);
-  border:2px solid var(--ink);cursor:pointer;
+  width:26px;height:26px;border-radius:50%;
+  background:var(--paper) url('istok_logo.png') center/75% no-repeat;
+  border:1px solid var(--gold);cursor:pointer;
 }
 .rag-card input[type=range]::-moz-range-track{height:6px;border-radius:3px;background:transparent}
 footer{margin-top:34px;font-size:13px;color:#5b665c}
@@ -116,7 +118,7 @@ footer a{color:var(--gold)}
       </div>
       <div class="field">
         <label for="people">Сотрудников за компьютером</label>
-        <input id="people" type="number" min="0" value="100">
+        <input id="people" type="number" min="0" value="50">
       </div>
       <div class="field">
         <label for="days">Рабочих дней в месяце</label>
@@ -169,8 +171,8 @@ footer a{color:var(--gold)}
     <h2>С RAG-системой ИСТОК</h2>
     <div class="field">
       <label for="reduction">Насколько сократится время поиска, %</label>
-      <input id="reduction" type="range" min="0" max="90" value="70">
-      <div class="hint"><span id="o-reduction">70</span>% сокращения</div>
+      <input id="reduction" type="range" min="0" max="90" value="66">
+      <div class="hint"><span id="o-reduction">66</span>% сокращения</div>
     </div>
     <div class="line"><span>потери сейчас, ₽/мес</span><span id="o-before">125 000 ₽</span></div>
     <div class="line"><span>потери с RAG, ₽/мес</span><span id="o-after">37 500 ₽</span></div>
