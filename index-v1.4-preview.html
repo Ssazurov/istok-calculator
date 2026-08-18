@@ -80,15 +80,6 @@ label{display:block;font-size:13px;color:#4b5a4f;margin-bottom:4px}
 }
 .stamp small{display:block;font-size:11px;letter-spacing:1px;opacity:.85}
 .stamp2 small{display:block;font-size:11px;letter-spacing:1px;opacity:.85}
-.time-note{
-  font-family:'IBM Plex Mono',monospace; font-size:12px; color:#5b665c;
-  margin-top:8px; margin-left:50px; max-width:220px;
-}
-.time-note2{
-  font-family:'IBM Plex Mono',monospace; font-size:12px; color:#5b665c;
-  margin-top:8px; margin-left:300px; max-width:220px;
-}
-@media (max-width:760px){ .time-note,.time-note2{margin-left:0} }
 .rag-card{margin-top:28px}
 .rag-card .line{display:flex;justify-content:space-between;padding:4px 0;
   font-family:'IBM Plex Mono',monospace;font-size:14px;color:#33402f}
@@ -168,12 +159,12 @@ footer a{color:var(--gold)}
         <div class="line"><span>x стоимость часа</span><span id="o-hour-cost">340 ₽</span></div>
         <hr>
         <div class="total-label">ИТОГО В МЕСЯЦ</div>
-        <div class="line"><span>потери компании</span><span id="o-month">125 000 ₽</span></div>
-        <br>
+        <div class="line"><span>потеря прибыли</span><span id="o-month">125 000 ₽</span></div>         
+        <div class="line"><span>потеря времени</span><span id="o-month-days-note">45,8 р.д.</span></div>
+      <br>
         <br>
         <div class="stamp">≈ <span id="o-month-stamp">125 000 ₽</span><small>потерь в месяц</small></div>
-        <div class="time-note">= <span id="o-month-hours-note">366 ч</span> (<span id="o-month-days-note">45,8 раб.дня</span>) потерь времени в месяц</div>
-      </div>
+          </div>
     </div>
   </div>
 
@@ -187,8 +178,8 @@ footer a{color:var(--gold)}
     <div class="line"><span>потери сейчас, ₽/мес</span><span id="o-before">125 000 ₽</span></div>
     <div class="line"><span>потери с RAG, ₽/мес</span><span id="o-after">37 500 ₽</span></div>
     <div class="line"><span>экономия в месяц</span><span id="o-savings-month">87 500 ₽</span></div>
+    <div class="line"><span>экономия времени</span><span id="o-savings-days-note">30,1 р.д.</span></div>
     <div class="stamp2">экономия <span id="o-savings-year">1 050 000 ₽</span><small>в год</small></div>
-    <div class="time-note2">= <span id="o-savings-hours-note">241 ч</span> (<span id="o-savings-days-note">30,1 раб.дня</span>) высвобождается в месяц</div>
   </div>
 
   <footer>
@@ -235,6 +226,7 @@ function calc(){
   const savings = monthLoss - afterLoss;
   const workDay = mode==='salary' ? hours : 8;
   const savingsHours = hoursTotal * (reduction/100);
+  const fmt1 = n => n.toLocaleString('ru-RU',{maximumFractionDigits:1});
 
   document.getElementById('o-minutes').textContent = fmt(minutes);
   document.getElementById('o-people').textContent = fmt(people);
@@ -249,10 +241,8 @@ function calc(){
   document.getElementById('o-after').textContent = fmt(afterLoss) + ' ₽';
   document.getElementById('o-savings-month').textContent = fmt(savings) + ' ₽';
   document.getElementById('o-savings-year').textContent = fmt(savings * 12) + ' ₽';
-  document.getElementById('o-month-hours-note').textContent = fmt(hoursTotal) + ' ч';
-  document.getElementById('o-month-days-note').textContent = (hoursTotal/workDay).toLocaleString('ru-RU',{maximumFractionDigits:1}) + ' раб.дня';
-  document.getElementById('o-savings-hours-note').textContent = fmt(savingsHours) + ' ч';
-  document.getElementById('o-savings-days-note').textContent = (savingsHours/workDay).toLocaleString('ru-RU',{maximumFractionDigits:1}) + ' раб.дня';
+  document.getElementById('o-month-days-note').textContent = fmt1(hoursTotal/workDay) + ' р.д.';
+  document.getElementById('o-savings-days-note').textContent = fmt1(savingsHours/workDay) + ' р.д.';
 
   const pct = (reduction - els.reduction.min) / (els.reduction.max - els.reduction.min) * 100 - 1;
   els.reduction.style.background = `linear-gradient(90deg,var(--stamp) 0%,var(--gold) ${pct}%,var(--rule) ${pct}%,var(--rule) 100%)`;
