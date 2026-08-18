@@ -98,6 +98,14 @@ label{display:block;font-size:13px;color:#4b5a4f;margin-bottom:4px}
   border:1px solid var(--gold);cursor:pointer;
 }
 .rag-card input[type=range]::-moz-range-track{height:6px;border-radius:3px;background:transparent}
+.ragcost-line{flex-direction:column;align-items:flex-start;gap:4px}
+.ragcost-line #o-savings-net{align-self:flex-end;font-weight:600}
+.inline-input{
+  width:52px; font-family:'IBM Plex Mono',monospace; font-size:14px;
+  background:transparent; border:none; border-bottom:1px dashed var(--rule);
+  color:var(--stamp); text-align:center; outline:none; margin:0 2px;
+}
+.inline-input:focus{border-bottom-color:var(--gold)}
 footer{margin-top:34px;font-size:13px;color:#5b665c}
 footer a{color:var(--gold)}
 </style>
@@ -114,7 +122,8 @@ footer a{color:var(--gold)}
       <h2>Ваши данные</h2>
       <div class="field">
         <label for="minutes">Минут в день на поиск информации (на 1 сотрудника)</label>
-        <input id="minutes" type="number" min="0" value="10">
+        <input id="minutes" type="number" min="0" value="20">
+        <div class="hint">Исследования (McKinsey, IDC) показывают потери до 1,8–2,5 часов в день на поиск информации у работников умственного труда</div>
       </div>
       <div class="field">
         <label for="people">Сотрудников за компьютером</label>
@@ -123,7 +132,6 @@ footer a{color:var(--gold)}
       <div class="field">
         <label for="days">Рабочих дней в месяце</label>
         <input id="days" type="number" min="1" value="22">
-        <div class="hint">по умолчанию — среднее по РФ</div>
       </div>
       <div class="field">
         <label>Как считать стоимость часа</label>
@@ -159,11 +167,12 @@ footer a{color:var(--gold)}
         <div class="line"><span>x стоимость часа</span><span id="o-hour-cost">340 ₽</span></div>
         <hr>
         <div class="total-label">ИТОГО В МЕСЯЦ</div>
-        <div class="line"><span>потери компании</span><span id="o-month">125 000 ₽</span></div>
+        <div class="line"><span>потеря прибыли</span><span id="o-month">125 000 ₽</span></div>         
+        <div class="line"><span>потеря времени</span><span id="o-month-days-note">45,8 р.д.</span></div>
         <br>
         <br>
         <div class="stamp">≈ <span id="o-month-stamp">125 000 ₽</span><small>потерь в месяц</small></div>
-      </div>
+          </div>
     </div>
   </div>
 
@@ -176,19 +185,28 @@ footer a{color:var(--gold)}
     </div>
     <div class="line"><span>потери сейчас, ₽/мес</span><span id="o-before">125 000 ₽</span></div>
     <div class="line"><span>потери с RAG, ₽/мес</span><span id="o-after">37 500 ₽</span></div>
-    <div class="line"><span>экономия в месяц</span><span id="o-savings-month">87 500 ₽</span></div>
+    <div class="line"><span>экономия прибыли в месяц</span><span id="o-savings-month">87 500 ₽</span></div>
+    <div class="line"><span>экономия времени в месяц</span><span id="o-savings-days-note">30,1 р.д.</span></div>
     <div class="stamp2">экономия <span id="o-savings-year">1 050 000 ₽</span><small>в год</small></div>
+    <br>
+    <br>
+    <div class="line ragcost-line">
+      <span>Например, при бюджете на RAG ~<input id="ragcost" type="number" min="0" value="30" class="inline-input">тыс. руб/мес экономия в год составит</span>
+      <span id="o-savings-net">87 500 ₽</span>
+    </div>
   </div>
 
   <footer>
-    Считаю только время на поиск — без учёта ошибок из-за устаревшей информации и повторной работы.
-    Строю RAG-систему для базы знаний компании — подробнее в
+    Калькулятор рассчитывает только время на поиск — без учёта выполнения дублирующей работы и исправления ошибок на основе устаревшей или неплолной информации. Реальные потери еще больше.
+  </footer>
+  <footer>
+    Анализирую работу бизнеса с точки зрения эффективного использования знаний — подробнее в
     <a href="https://t.me/istok_rag" target="_blank" rel="noopener">телеграм-канале</a>.
   </footer>
 </div>
 
 <script>
-const els = ['minutes','people','days','salary','hours','rate','reduction'].reduce((a,id)=>(a[id]=document.getElementById(id),a),{});
+const els = ['minutes','people','days','salary','hours','rate','reduction','ragcost'].reduce((a,id)=>(a[id]=document.getElementById(id),a),{});
 const fmt = n => Math.round(n).toLocaleString('ru-RU');
 let mode = 'salary';
 const btnSalary = document.getElementById('mode-salary');
@@ -217,11 +235,16 @@ function calc(){
 
   const minTotal = minutes * people * days;
   const hoursTotal = minTotal / 60;
-  const hourCost = mode==='salary' ? (salary / days / hours) : rate;
+  const hourCost = mode==='salary' ? (salary / 22 / hours) : rate;
   const monthLoss = hoursTotal * hourCost;
   const yearLoss = monthLoss * 12;
   const afterLoss = monthLoss * (1 - reduction/100);
   const savings = monthLoss - afterLoss;
+  const workDay = mode==='salary' ? hours : 8;
+  const savingsHours = hoursTotal * (reduction/100);
+  const RAG_COST = (+els.ragcost.value || 0) * 1000;
+  const netSavings = (savings - RAG_COST)*12;
+  const fmt1 = n => n.toLocaleString('ru-RU',{maximumFractionDigits:1});
 
   document.getElementById('o-minutes').textContent = fmt(minutes);
   document.getElementById('o-people').textContent = fmt(people);
@@ -236,6 +259,9 @@ function calc(){
   document.getElementById('o-after').textContent = fmt(afterLoss) + ' ₽';
   document.getElementById('o-savings-month').textContent = fmt(savings) + ' ₽';
   document.getElementById('o-savings-year').textContent = fmt(savings * 12) + ' ₽';
+  document.getElementById('o-month-days-note').textContent = fmt1(hoursTotal/workDay) + ' р.д.';
+  document.getElementById('o-savings-days-note').textContent = fmt1(savingsHours/workDay) + ' р.д.';
+  document.getElementById('o-savings-net').textContent = fmt(netSavings) + ' ₽';
 
   const pct = (reduction - els.reduction.min) / (els.reduction.max - els.reduction.min) * 100 - 1;
   els.reduction.style.background = `linear-gradient(90deg,var(--stamp) 0%,var(--gold) ${pct}%,var(--rule) ${pct}%,var(--rule) 100%)`;
